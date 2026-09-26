@@ -105,29 +105,65 @@ export default async function MemberProfilePage({ params }: PageProps) {
           <div className="p-6 sm:p-10 md:p-12 pb-4 sm:pb-5 relative z-10">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 lg:gap-14 items-center">
             
-            {/* Left: Circular Profile Photo & Social Actions */}
+            {/* Left: Circular Profile Photo with Organic Brand Blob Backdrop & Social Actions */}
             <div className="md:col-span-5 flex flex-col items-center justify-center">
-              {/* Circular Photo Container */}
-              <div className="relative w-52 h-52 sm:w-60 sm:h-60 aspect-square rounded-full overflow-hidden bg-muted border-4 border-white shadow-xl shadow-black/10 ring-2 ring-brand-orange/30 flex items-center justify-center">
-                {member.image_url ? (
-                  <>
-                    <Image
-                      src={member.image_url}
-                      alt={member.name}
-                      fill
-                      priority
-                      sizes="(max-width: 768px) 240px, 280px"
-                      className="object-cover grayscale contrast-105"
+              {/* Photo & Organic Blob Wrapper */}
+              <div className="relative flex items-center justify-center my-2 sm:my-3">
+                {/* Organic Asymmetric Brand Gradient Blob Backdrop */}
+                <div 
+                  className="absolute -inset-6 sm:-inset-8 pointer-events-none -z-0 flex items-center justify-center"
+                  aria-hidden="true"
+                >
+                  <svg 
+                    viewBox="0 0 540 560" 
+                    fill="none" 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="w-full h-full filter drop-shadow-[0_16px_30px_rgba(240,127,25,0.22)] scale-110 sm:scale-115"
+                  >
+                    <defs>
+                      <linearGradient id="memberBlobGrad" x1="15%" y1="0%" x2="85%" y2="100%">
+                        <stop offset="0%" stopColor="#F07F19" />
+                        <stop offset="35%" stopColor="#FFA875" />
+                        <stop offset="70%" stopColor="#FBC896" />
+                        <stop offset="100%" stopColor="#FDEEDD" />
+                      </linearGradient>
+                    </defs>
+                    <path 
+                      d="M 280,30
+                         C 365,30 420,85 410,165
+                         C 400,230 475,265 495,345
+                         C 515,425 440,495 360,515
+                         C 280,535 200,525 135,475
+                         C 65,420 30,350 40,280
+                         C 50,205 135,220 155,150
+                         C 175,80 200,30 280,30 Z"
+                      fill="url(#memberBlobGrad)"
                     />
-                    {/* Subtle bottom fade gradient */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
-                  </>
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-secondary text-muted-foreground">
-                    <Users className="w-16 h-16 stroke-[1.5] mb-2 opacity-50 text-brand-orange" />
-                    <span className="text-[11px] font-bold uppercase tracking-wider">No Photo</span>
-                  </div>
-                )}
+                  </svg>
+                </div>
+
+                {/* Circular Photo Container */}
+                <div className="relative z-10 w-52 h-52 sm:w-60 sm:h-60 aspect-square rounded-full overflow-hidden bg-muted border-4 border-white shadow-xl shadow-black/10 ring-2 ring-brand-orange/30 flex items-center justify-center">
+                  {member.image_url ? (
+                    <>
+                      <Image
+                        src={member.image_url}
+                        alt={member.name}
+                        fill
+                        priority
+                        sizes="(max-width: 768px) 240px, 280px"
+                        className="object-cover grayscale contrast-105"
+                      />
+                      {/* Subtle bottom fade gradient */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent pointer-events-none" />
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center bg-secondary text-muted-foreground">
+                      <Users className="w-16 h-16 stroke-[1.5] mb-2 opacity-50 text-brand-orange" />
+                      <span className="text-[11px] font-bold uppercase tracking-wider">No Photo</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Social Link Buttons */}
