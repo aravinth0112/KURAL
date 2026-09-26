@@ -1,7 +1,10 @@
 import { Metadata } from "next";
 import Script from "next/script";
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, MessageSquare } from "lucide-react";
 import ContactForm from "./ContactForm";
+import { createClient } from "@/utils/supabase/server";
+
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Contact Kural LPU | LPU Tamizhans — Tamil Student Community at LPU",
@@ -52,8 +55,29 @@ const contactPageJsonLd = {
   },
 };
 
+export default async function ContactPage() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("site_content").select("id, content");
 
-export default function ContactPage() {
+  let title = "Get in Touch.";
+  let subtitle = "Have a question, want to collaborate, or looking to join the Kural core team? We'd love to hear from you.";
+  let email = "contact.kurallpu@gmail.com";
+  let phone = "+91 93603 64837";
+  let whatsappLink = "https://chat.whatsapp.com/GTha3bg0pZI43xIFPl9SMe";
+  let address = "Lovely Professional University\nPhagwara, Punjab, India";
+  let instagramLink = "https://www.instagram.com/lpu.tamizhans?stkn=MXV5NWlyMG5kb2o4ag==";
+
+  if (data) {
+    const getVal = (id: string) => data.find((r) => r.id === id)?.content;
+    if (getVal("contact_title")) title = getVal("contact_title")!;
+    if (getVal("contact_subtitle")) subtitle = getVal("contact_subtitle")!;
+    if (getVal("contact_email")) email = getVal("contact_email")!;
+    if (getVal("contact_phone")) phone = getVal("contact_phone")!;
+    if (getVal("contact_whatsapp_link")) whatsappLink = getVal("contact_whatsapp_link")!;
+    if (getVal("contact_address")) address = getVal("contact_address")!;
+    if (getVal("contact_instagram_link")) instagramLink = getVal("contact_instagram_link")!;
+  }
+
   return (
     <div className="pt-32 pb-24 container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
       <Script
@@ -63,10 +87,10 @@ export default function ContactPage() {
       />
       <div className="text-center mb-16">
         <h1 className="font-heading text-5xl md:text-7xl font-extrabold tracking-tight mb-6 text-foreground">
-          Get in Touch.
+          {title}
         </h1>
         <p className="text-muted-foreground text-xl max-w-2xl mx-auto font-medium leading-relaxed">
-          Have a question, want to collaborate, or looking to join the Kural core team? We&apos;d love to hear from you.
+          {subtitle}
         </p>
       </div>
 
@@ -82,8 +106,8 @@ export default function ContactPage() {
             </div>
             <div>
               <p className="font-bold text-foreground mb-1">Phone</p>
-              <a href="tel:+919360364837" className="text-muted-foreground hover:text-primary transition-colors font-medium">
-                +91 93603 64837
+              <a href={`tel:${phone.replace(/\s+/g, '')}`} className="text-muted-foreground hover:text-primary transition-colors font-medium">
+                {phone}
               </a>
             </div>
           </div>
@@ -94,23 +118,39 @@ export default function ContactPage() {
             </div>
             <div>
               <p className="font-bold text-foreground mb-1">Email</p>
-              <a href="mailto:contact.kurallpu@gmail.com" className="text-muted-foreground hover:text-primary transition-colors font-medium">
-                contact.kurallpu@gmail.com
+              <a href={`mailto:${email}`} className="text-muted-foreground hover:text-primary transition-colors font-medium">
+                {email}
               </a>
             </div>
           </div>
 
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0 shadow-sm">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-primary"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+          {whatsappLink && (
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                <MessageSquare className="w-5 h-5 text-emerald-600" />
+              </div>
+              <div>
+                <p className="font-bold text-foreground mb-1">WhatsApp</p>
+                <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors font-medium">
+                  Join WhatsApp Community
+                </a>
+              </div>
             </div>
-            <div>
-              <p className="font-bold text-foreground mb-1">Instagram</p>
-              <a href="https://www.instagram.com/lpu.tamizhans?stkn=MXV5NWlyMG5kb2o4ag==" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors font-medium">
-                @lpu.tamizhans
-              </a>
+          )}
+
+          {instagramLink && (
+            <div className="flex items-start gap-4">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0 shadow-sm">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 text-primary"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+              </div>
+              <div>
+                <p className="font-bold text-foreground mb-1">Instagram</p>
+                <a href={instagramLink} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-primary transition-colors font-medium">
+                  @lpu.tamizhans
+                </a>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="flex items-start gap-4">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shrink-0 shadow-sm">
@@ -118,9 +158,8 @@ export default function ContactPage() {
             </div>
             <div className="flex-1">
               <p className="font-bold text-foreground mb-1">Location</p>
-              <p className="text-muted-foreground font-medium mb-3">
-                Lovely Professional University<br />
-                Phagwara, Punjab, India
+              <p className="text-muted-foreground font-medium mb-3 whitespace-pre-line">
+                {address}
               </p>
               <div className="w-full h-44 rounded-2xl overflow-hidden border border-border shadow-inner relative bg-muted">
                 <iframe
@@ -155,4 +194,3 @@ export default function ContactPage() {
     </div>
   );
 }
-

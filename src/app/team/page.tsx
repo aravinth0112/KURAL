@@ -51,6 +51,35 @@ export default async function TeamPage() {
     .order("order_num", { ascending: true })
     .order("id", { ascending: true });
 
+  const { data: contentData } = await supabase.from("site_content").select("id, content");
+
+  let recruitmentBadge = "Open Positions";
+  let recruitmentTitle = "Be Part of Our Team.";
+  let recruitmentSubtitle = "Want to help build the community? Share your details below and our team will reach out to you. Every role matters — whether you're a performer, organiser, creator, or leader.";
+  let schoolsList: string[] | undefined;
+  let batchesList: string[] | undefined;
+  let interestsList: string[] | undefined;
+
+  if (contentData) {
+    const getVal = (id: string) => contentData.find((r) => r.id === id)?.content;
+    if (getVal("recruitment_badge")) recruitmentBadge = getVal("recruitment_badge")!;
+    if (getVal("recruitment_title")) recruitmentTitle = getVal("recruitment_title")!;
+    if (getVal("recruitment_subtitle")) recruitmentSubtitle = getVal("recruitment_subtitle")!;
+
+    const sVal = getVal("recruitment_schools");
+    if (sVal) schoolsList = sVal.split("\n").map((s: string) => s.trim()).filter(Boolean);
+
+    const bVal = getVal("recruitment_batches");
+    if (bVal) batchesList = bVal.split("\n").map((b: string) => b.trim()).filter(Boolean);
+
+    const iVal = getVal("recruitment_interests");
+    if (iVal) interestsList = iVal.split("\n").map((i: string) => i.trim()).filter(Boolean);
+  }
+
+  const recruitWords = recruitmentTitle.split(" ");
+  const recruitLastWord = recruitWords.pop();
+  const recruitFirstPart = recruitWords.join(" ");
+
   return (
     <div className="pt-32 sm:pt-36 pb-20 sm:pb-24 container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
       {members && members.length > 0 && (
@@ -201,18 +230,22 @@ export default async function TeamPage() {
           <div className="text-center mb-10">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider mb-4">
               <UserPlus className="w-3.5 h-3.5" />
-              Open Positions
+              {recruitmentBadge}
             </div>
             <h2 className="font-heading text-3xl sm:text-4xl md:text-5xl font-extrabold text-foreground mb-3">
-              Be Part of <span className="text-primary">Our Team.</span>
+              {recruitFirstPart} <span className="text-primary">{recruitLastWord}</span>
             </h2>
             <p className="text-muted-foreground text-base sm:text-lg font-medium leading-relaxed max-w-2xl mx-auto">
-              Want to help build the community? Share your details below and our team will reach out to you. Every role matters — whether you're a performer, organiser, creator, or leader.
+              {recruitmentSubtitle}
             </p>
           </div>
 
           {/* Form */}
-          <JoinTeamForm />
+          <JoinTeamForm 
+            schools={schoolsList}
+            batches={batchesList}
+            interests={interestsList}
+          />
         </div>
       </section>
     </div>

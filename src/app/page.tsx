@@ -117,23 +117,47 @@ export default async function Home() {
   // If no moments are explicitly featured yet, fallback to top 3 latest so home is not empty
   const moments = featuredMoments.length > 0 ? featuredMoments : (allMoments || []).slice(0, 3);
   
-  let heroQuote = '"யாதும் ஊரே! யாவரும் கேளிர்!"';
+  let heroTitle = "We're LPU Tamizhans.";
+  let heroQuote = "யாதும் ஊரே! யாவரும் கேளிர்!";
   let homeHeroText = "The vibrant home of Tamil culture at Lovely Professional University. Connecting Tamil students across campus through cultural celebrations, creative arts, and lifelong friendships.";
+  let btnWhatsappText = "Join WhatsApp Community";
+  let btnWhatsappLink = "https://chat.whatsapp.com/GTha3bg0pZI43xIFPl9SMe";
+  let btnKuralText = "Learn About Kural";
+  let btnKuralLink = "/kural";
+  let logoUrl = "/logo.png";
   let momentsTitle = "Moments.";
   let momentsSubtitle = "Memories from our past celebrations.";
 
   if (contentData) {
+    const ht = contentData.find(r => r.id === 'home_hero_title');
+    if (ht?.content) heroTitle = ht.content;
+
     const qRow = contentData.find(r => r.id === 'about_tamil_quote');
-    if (qRow) heroQuote = `"${qRow.content}"`;
+    if (qRow?.content) heroQuote = qRow.content.replace(/^["“']|["”']$/g, '');
 
     const hT = contentData.find(r => r.id === 'home_hero_text');
-    if (hT) homeHeroText = hT.content;
+    if (hT?.content) homeHeroText = hT.content;
+
+    const bwT = contentData.find(r => r.id === 'home_btn_whatsapp_text');
+    if (bwT?.content) btnWhatsappText = bwT.content;
+
+    const bwL = contentData.find(r => r.id === 'home_btn_whatsapp_link');
+    if (bwL?.content) btnWhatsappLink = bwL.content;
+
+    const bkT = contentData.find(r => r.id === 'home_btn_kural_text');
+    if (bkT?.content) btnKuralText = bkT.content;
+
+    const bkL = contentData.find(r => r.id === 'home_btn_kural_link');
+    if (bkL?.content) btnKuralLink = bkL.content;
+
+    const lu = contentData.find(r => r.id === 'home_logo_url');
+    if (lu?.content) logoUrl = lu.content;
 
     const mT = contentData.find(r => r.id === 'home_moments_title');
-    if (mT) momentsTitle = mT.content;
+    if (mT?.content) momentsTitle = mT.content;
 
     const mS = contentData.find(r => r.id === 'home_moments_subtitle');
-    if (mS) momentsSubtitle = mS.content;
+    if (mS?.content) momentsSubtitle = mS.content;
   }
 
   return (
@@ -160,35 +184,41 @@ export default async function Home() {
 
               {/* Large Two-Line Heading */}
               <h1 className="font-heading text-5xl sm:text-6xl md:text-7xl lg:text-[76px] font-extrabold tracking-tight text-[#1A1A1A] leading-[1.08] mb-3">
-                We're <br />
-                <span className="text-brand-orange">LPU Tamizhans.</span>
+                {heroTitle.includes("LPU Tamizhans") ? (
+                  <>
+                    {heroTitle.split("LPU Tamizhans")[0]} <br />
+                    <span className="text-brand-orange">LPU Tamizhans{heroTitle.split("LPU Tamizhans")[1] || "."}</span>
+                  </>
+                ) : (
+                  heroTitle
+                )}
               </h1>
 
               {/* Tamil Quote */}
               <p className="text-xl sm:text-2xl font-bold text-brand-orange tracking-wide mb-4">
-                &ldquo;யாதும் ஊரே! யாவரும் கேளிர்!&rdquo;
+                &ldquo;{heroQuote}&rdquo;
               </p>
 
               {/* Body Paragraph */}
               <p className="text-[#6B7280] text-base sm:text-lg leading-relaxed max-w-[460px] mb-8 font-normal">
-                {homeHeroText || "Bringing Tamil students together to celebrate our culture, build connections, and create meaningful moments at LPU."}
+                {homeHeroText}
               </p>
 
               {/* Two Action Buttons Side-by-Side */}
               <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
                 <Link
-                  href="https://chat.whatsapp.com/GTha3bg0pZI43xIFPl9SMe"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href={btnWhatsappLink}
+                  target={btnWhatsappLink.startsWith("http") ? "_blank" : undefined}
+                  rel={btnWhatsappLink.startsWith("http") ? "noopener noreferrer" : undefined}
                   className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-3.5 rounded-full font-bold text-sm sm:text-base text-white bg-brand-orange hover:bg-brand-orange/90 shadow-md shadow-brand-orange/20 transition-all hover:scale-[1.02] cursor-pointer"
                 >
-                  Join WhatsApp Community
+                  {btnWhatsappText}
                 </Link>
                 <Link
-                  href="/kural"
+                  href={btnKuralLink}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full font-bold text-sm sm:text-base text-[#1A1A1A] bg-white border-2 border-[#1A1A1A] hover:bg-gray-50 transition-all hover:scale-[1.02] cursor-pointer"
                 >
-                  <span>Learn About Kural</span>
+                  <span>{btnKuralText}</span>
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -199,7 +229,7 @@ export default async function Home() {
               {/* Floating Circular White Badge/Logo with Turban Motif */}
               <div className="w-56 h-56 sm:w-64 sm:h-64 md:w-72 md:h-72 lg:w-80 lg:h-80 rounded-full bg-white shadow-xl shadow-black/10 flex items-center justify-center p-8 sm:p-10 relative">
                 <Image 
-                  src="/logo.png" 
+                  src={logoUrl || "/logo.png"} 
                   alt="LPU Tamizhans Turban Motif" 
                   width={240} 
                   height={240} 

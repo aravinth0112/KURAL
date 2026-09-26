@@ -4,7 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { Send, CheckCircle2, Loader2 } from "lucide-react";
 
-const LPU_SCHOOLS = [
+interface JoinTeamFormProps {
+  schools?: string[];
+  batches?: string[];
+  interests?: string[];
+}
+
+const DEFAULT_LPU_SCHOOLS = [
   "School of Computer Science & Engineering (CSE)",
   "School of Electronics & Electrical Engineering (EEE)",
   "School of Mechanical Engineering",
@@ -22,7 +28,7 @@ const LPU_SCHOOLS = [
   "Other School / Faculty",
 ];
 
-const BATCH_YEARS = [
+const DEFAULT_BATCH_YEARS = [
   "Batch 2021 - 2025",
   "Batch 2022 - 2026",
   "Batch 2023 - 2027",
@@ -32,7 +38,22 @@ const BATCH_YEARS = [
   "Other / Diploma",
 ];
 
-export default function JoinTeamForm() {
+const DEFAULT_INTEREST_AREAS = [
+  "Event Planning & Coordination",
+  "Creative & Design",
+  "Photography & Videography",
+  "Social Media & Content",
+  "Music & Live Performances",
+  "Public Relations & Outreach",
+  "Web & Technical Operations",
+  "Leadership & Operations",
+  "General Volunteering",
+];
+
+export default function JoinTeamForm({ schools, batches, interests }: JoinTeamFormProps = {}) {
+  const schoolsList = schools && schools.length > 0 ? schools : DEFAULT_LPU_SCHOOLS;
+  const batchesList = batches && batches.length > 0 ? batches : DEFAULT_BATCH_YEARS;
+  const interestsList = interests && interests.length > 0 ? interests : DEFAULT_INTEREST_AREAS;
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -211,7 +232,7 @@ export default function JoinTeamForm() {
             className="w-full h-11 sm:h-12 bg-secondary border border-border rounded-xl px-4 text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all cursor-pointer"
           >
             <option value="">Select your School / Department</option>
-            {LPU_SCHOOLS.map((school) => (
+            {schoolsList.map((school) => (
               <option key={school} value={school}>{school}</option>
             ))}
           </select>
@@ -239,7 +260,7 @@ export default function JoinTeamForm() {
             className="w-full h-11 sm:h-12 bg-secondary border border-border rounded-xl px-4 text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all cursor-pointer"
           >
             <option value="">Select your Batch / Year</option>
-            {BATCH_YEARS.map((b) => (
+            {batchesList.map((b) => (
               <option key={b} value={b}>{b}</option>
             ))}
           </select>
@@ -257,15 +278,9 @@ export default function JoinTeamForm() {
             className="w-full h-11 sm:h-12 bg-secondary border border-border rounded-xl px-4 text-sm font-medium focus:ring-2 focus:ring-primary focus:outline-none transition-all cursor-pointer"
           >
             <option value="">Select an area</option>
-            <option value="Event Planning">Event Planning &amp; Coordination</option>
-            <option value="Creative and Design">Creative &amp; Design</option>
-            <option value="Photography and Videography">Photography &amp; Videography</option>
-            <option value="Social Media and Content">Social Media &amp; Content</option>
-            <option value="Music and Performances">Music &amp; Live Performances</option>
-            <option value="Public Relations">Public Relations &amp; Outreach</option>
-            <option value="Web and Tech">Web &amp; Technical Operations</option>
-            <option value="Leadership and Management">Leadership &amp; Operations</option>
-            <option value="General Volunteering">General Volunteering</option>
+            {interestsList.map((item) => (
+              <option key={item} value={item}>{item}</option>
+            ))}
           </select>
         </div>
       </div>
