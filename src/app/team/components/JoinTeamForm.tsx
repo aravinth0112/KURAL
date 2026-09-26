@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Send, CheckCircle2, Loader2, ShieldCheck } from "lucide-react";
+import { Send, CheckCircle2, Loader2 } from "lucide-react";
 
 const LPU_SCHOOLS = [
   "School of Computer Science & Engineering (CSE)",

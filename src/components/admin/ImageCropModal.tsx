@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useEffect } from "react";
 import Cropper, { Area } from "react-easy-crop";
-import { X, ZoomIn, ZoomOut, Crop, Loader2, Sparkles } from "lucide-react";
+import { X, ZoomIn, ZoomOut, Crop, Loader2 } from "lucide-react";
 import { getCroppedImg } from "@/utils/cropImage";
 
 export interface ImageCropModalProps {

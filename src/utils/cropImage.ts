@@ -86,3 +86,15 @@ export async function getCroppedImg(
     );
   });
 }
+
+/**
+ * Centralized unique file name generator for Supabase storage uploads.
+ * Produces clean, collision-free names like 'prefix_1790438396467_i12ozn.jpg'.
+ */
+export function generateMediaFileName(prefix: string, fileOrExt: File | string): string {
+  const ext = typeof fileOrExt === "string"
+    ? (fileOrExt.includes(".") ? fileOrExt.split(".").pop() : fileOrExt)
+    : (fileOrExt.name.split(".").pop() || "jpg");
+  return `${prefix}_${Date.now()}_${Math.random().toString(36).substring(7)}.${ext}`;
+}
+

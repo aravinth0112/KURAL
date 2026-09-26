@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Script from "next/script";
 import { Metadata } from "next";
-import { ArrowRight, GraduationCap, Calendar, Users, Sparkles, UserPlus } from "lucide-react";
+import { ArrowRight, GraduationCap, Calendar, Users, UserPlus } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
 import JoinTeamForm from "./components/JoinTeamForm";
 

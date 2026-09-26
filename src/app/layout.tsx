@@ -103,6 +103,7 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${dmSans.variable} ${notoTamil.variable} font-sans scroll-smooth`}
+      data-scroll-behavior="smooth"
       suppressHydrationWarning
     >
       <body className="antialiased min-h-screen flex flex-col selection:bg-primary/20 selection:text-foreground overflow-x-hidden w-full max-w-full">

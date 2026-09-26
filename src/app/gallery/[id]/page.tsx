@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Script from "next/script";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, Calendar, MapPin, Users, Tag, Sparkles, Activity, FileText } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Users, Tag, Sparkles, Activity, FileText } from "lucide-react";
 import { createClient } from "@/utils/supabase/server";
 import { LayeredWaves } from "@/components/decorative/LayeredWaves";
 import EventGallery from "./EventGallery";
