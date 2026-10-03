@@ -419,7 +419,7 @@ export default function AdminLogin() {
               </button>
             </form>
 
-            {/* Single Admin Manual Recovery Guidance */}
+            {/* Account Recovery Guidance */}
             <div className="mt-6 pt-5 border-t border-border/80">
               <button
                 type="button"
@@ -427,22 +427,16 @@ export default function AdminLogin() {
                 className="w-full text-xs font-bold text-muted-foreground hover:text-primary transition-colors flex items-center justify-center gap-1 cursor-pointer"
               >
                 <HelpCircle className="w-3.5 h-3.5" />
-                <span>Lost authenticator device? View recovery steps</span>
+                <span>Lost authenticator device?</span>
               </button>
 
               {showRecoveryInfo && (
-                <div className="mt-3 bg-secondary/80 p-3.5 rounded-2xl border border-border text-left text-xs space-y-2">
+                <div className="mt-3 bg-secondary/80 p-3.5 rounded-2xl border border-border text-center text-xs space-y-1.5">
                   <p className="font-bold text-foreground">
-                    Admin Recovery Instructions:
+                    Lost Authenticator Access
                   </p>
                   <p className="text-muted-foreground leading-relaxed text-[11px]">
-                    As the administrator, if you lose access to your phone or authenticator app, sign into your Supabase Dashboard, open the <strong>SQL Editor</strong>, and run:
-                  </p>
-                  <pre className="bg-slate-900 text-slate-100 p-2.5 rounded-xl text-[10px] font-mono overflow-x-auto select-all">
-                    DELETE FROM auth.mfa_factors WHERE user_id IN (SELECT user_id FROM public.admins);
-                  </pre>
-                  <p className="text-muted-foreground text-[11px] leading-relaxed">
-                    Once executed, sign in again with your email and password to be presented with a fresh 2FA enrollment QR code.
+                    Contact the site administrator or refer to your private recovery documentation to reset your authenticator credentials.
                   </p>
                 </div>
               )}
