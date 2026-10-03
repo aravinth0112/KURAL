@@ -108,20 +108,20 @@ export default async function MemberProfilePage({ params }: PageProps) {
             {/* Left: Circular Profile Photo with Organic Brand Blob Backdrop & Social Actions */}
             <div className="md:col-span-5 flex flex-col items-center justify-center">
               {/* Photo & Organic Blob Wrapper */}
-              <div className="relative flex items-center justify-center my-2 sm:my-3">
+              <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center my-2 sm:my-3">
                 {/* Organic Asymmetric Brand Gradient Blob Backdrop */}
                 <div 
-                  className="absolute -inset-6 sm:-inset-8 pointer-events-none -z-0 flex items-center justify-center"
+                  className="absolute -inset-8 sm:-inset-10 pointer-events-none -z-0 flex items-center justify-center"
                   aria-hidden="true"
                 >
                   <svg 
-                    viewBox="0 0 540 560" 
+                    viewBox="0 0 600 600" 
                     fill="none" 
                     xmlns="http://www.w3.org/2000/svg" 
-                    className="w-full h-full filter drop-shadow-[0_16px_30px_rgba(240,127,25,0.22)] scale-110 sm:scale-115"
+                    className="w-full h-full filter drop-shadow-[0_16px_32px_rgba(240,127,25,0.22)]"
                   >
                     <defs>
-                      <linearGradient id="memberBlobGrad" x1="15%" y1="0%" x2="85%" y2="100%">
+                      <linearGradient id="memberBlobGrad" x1="20%" y1="0%" x2="80%" y2="100%">
                         <stop offset="0%" stopColor="#F07F19" />
                         <stop offset="35%" stopColor="#FFA875" />
                         <stop offset="70%" stopColor="#FBC896" />
@@ -129,21 +129,14 @@ export default async function MemberProfilePage({ params }: PageProps) {
                       </linearGradient>
                     </defs>
                     <path 
-                      d="M 280,30
-                         C 365,30 420,85 410,165
-                         C 400,230 475,265 495,345
-                         C 515,425 440,495 360,515
-                         C 280,535 200,525 135,475
-                         C 65,420 30,350 40,280
-                         C 50,205 135,220 155,150
-                         C 175,80 200,30 280,30 Z"
-                      fill="url(#memberBlobGrad)"
+                      d="M 300.00,60.00 C 376.15,65.96 401.04,131.09 445.01,232.38 C 488.98,333.68 501.91,364.02 457.04,431.77 C 412.17,499.52 389.62,482.83 284.75,474.33 C 179.87,465.84 113.77,475.14 82.49,401.43 C 51.21,327.72 112.13,303.90 173.03,211.10 C 233.94,118.30 223.85,54.04 300.00,60.00 Z" 
+                      fill="url(#memberBlobGrad)" 
                     />
                   </svg>
                 </div>
 
                 {/* Circular Photo Container */}
-                <div className="relative z-10 w-52 h-52 sm:w-60 sm:h-60 aspect-square rounded-full overflow-hidden bg-muted border-4 border-white shadow-xl shadow-black/10 ring-2 ring-brand-orange/30 flex items-center justify-center">
+                <div className="relative z-10 w-52 h-52 sm:w-60 sm:h-60 aspect-square rounded-full overflow-hidden bg-muted border-4 border-white shadow-xl shadow-black/10 flex items-center justify-center">
                   {member.image_url ? (
                     <>
                       <Image
