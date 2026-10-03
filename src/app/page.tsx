@@ -150,8 +150,10 @@ export default async function Home() {
     const bkL = contentData.find(r => r.id === 'home_btn_kural_link');
     if (bkL?.content) btnKuralLink = bkL.content;
 
-    const lu = contentData.find(r => r.id === 'home_logo_url');
-    if (lu?.content) logoUrl = lu.content;
+    const heroLu = contentData.find(r => r.id === 'hero_logo_url');
+    const homeLu = contentData.find(r => r.id === 'home_logo_url');
+    if (heroLu?.content) logoUrl = heroLu.content;
+    else if (homeLu?.content) logoUrl = homeLu.content;
 
     const mT = contentData.find(r => r.id === 'home_moments_title');
     if (mT?.content) momentsTitle = mT.content;

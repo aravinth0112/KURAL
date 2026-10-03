@@ -3,8 +3,11 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Home, ExternalLink, Save, CheckCircle2 } from "lucide-react";
+import { Home, ExternalLink, Save, CheckCircle2, Camera, Crop, RotateCcw, AlertCircle } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
+import { compressImage } from "@/utils/compressImage";
+import { generateMediaFileName } from "@/utils/cropImage";
+import ImageCropModal from "@/components/admin/ImageCropModal";
 
 interface AdminHomeSectionProps {
   onShowToast: (msg: string, type: "success" | "error" | "info") => void;
@@ -25,6 +28,21 @@ export default function AdminHomeSection({ onShowToast }: AdminHomeSectionProps)
   const [btnKuralText, setBtnKuralText] = useState("Learn About Kural");
   const [btnKuralLink, setBtnKuralLink] = useState("/kural");
   const [logoUrl, setLogoUrl] = useState("/logo.png");
+  const [heroLogoFile, setHeroLogoFile] = useState<File | null>(null);
+  const [uploadingHeroLogo, setUploadingHeroLogo] = useState(false);
+
+  // Crop Modal State
+  const [activeCrop, setActiveCrop] = useState<{
+    isOpen: boolean;
+    imageSrc: string;
+    fileName: string;
+    title: string;
+    aspectRatio: number;
+    aspectLabel?: string;
+    showCircleGuide?: boolean;
+    maxWidth?: number;
+    maxHeight?: number;
+  } | null>(null);
 
   // Moments Showcase block on homepage
   const [homeMomentsTitle, setHomeMomentsTitle] = useState("Recent Moments.");
@@ -53,17 +71,93 @@ export default function AdminHomeSection({ onShowToast }: AdminHomeSectionProps)
       if (getVal("home_btn_whatsapp_link")) setBtnWhatsappLink(getVal("home_btn_whatsapp_link")!);
       if (getVal("home_btn_kural_text")) setBtnKuralText(getVal("home_btn_kural_text")!);
       if (getVal("home_btn_kural_link")) setBtnKuralLink(getVal("home_btn_kural_link")!);
-      if (getVal("home_logo_url")) setLogoUrl(getVal("home_logo_url")!);
+      
+      const loadedLogo = getVal("hero_logo_url") || getVal("home_logo_url");
+      if (loadedLogo) setLogoUrl(loadedLogo);
+
       if (getVal("home_moments_title")) setHomeMomentsTitle(getVal("home_moments_title")!);
       if (getVal("home_moments_subtitle")) setHomeMomentsSubtitle(getVal("home_moments_subtitle")!);
     }
     setLoading(false);
   };
 
+  const handleSelectLogo = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const chosenFile = e.target.files?.[0];
+    if (!chosenFile) return;
+    const objectUrl = URL.createObjectURL(chosenFile);
+    setActiveCrop({
+      isOpen: true,
+      imageSrc: objectUrl,
+      fileName: chosenFile.name,
+      title: "Crop Homepage Hero Emblem",
+      aspectRatio: 1,
+      aspectLabel: "1:1 Square (Circular Badge)",
+      showCircleGuide: true,
+      maxWidth: 600,
+      maxHeight: 600,
+    });
+    e.target.value = "";
+  };
+
+  const handleRecropLogo = () => {
+    const targetUrl = heroLogoFile ? URL.createObjectURL(heroLogoFile) : (logoUrl || "/logo.png");
+    setActiveCrop({
+      isOpen: true,
+      imageSrc: targetUrl,
+      fileName: "hero_logo.png",
+      title: "Re-crop Homepage Hero Emblem",
+      aspectRatio: 1,
+      aspectLabel: "1:1 Square (Circular Badge)",
+      showCircleGuide: true,
+      maxWidth: 600,
+      maxHeight: 600,
+    });
+  };
+
+  const handleResetLogo = () => {
+    setHeroLogoFile(null);
+    setLogoUrl("/logo.png");
+    onShowToast("Hero logo reset to default emblem.", "info");
+  };
+
+  const handleCropApply = (croppedFile: File) => {
+    setHeroLogoFile(croppedFile);
+    setActiveCrop(null);
+    onShowToast("Hero emblem cropped & staged. Click Save to publish.", "success");
+  };
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
     const supabase = createClient();
+
+    let finalLogoUrl = logoUrl;
+    if (heroLogoFile) {
+      setUploadingHeroLogo(true);
+      try {
+        const processedFile = await compressImage(heroLogoFile, 600, 600, 0.85);
+        const fileName = generateMediaFileName("hero_logo", processedFile);
+        const { error: uploadError } = await supabase.storage.from("moments").upload(fileName, processedFile);
+
+        if (uploadError) {
+          onShowToast("Hero logo upload failed: " + uploadError.message, "error");
+          setSaving(false);
+          setUploadingHeroLogo(false);
+          return;
+        }
+
+        const { data: { publicUrl } } = supabase.storage.from("moments").getPublicUrl(fileName);
+        finalLogoUrl = publicUrl;
+        setLogoUrl(finalLogoUrl);
+        setHeroLogoFile(null);
+      } catch (err: any) {
+        onShowToast("Error processing logo image: " + err.message, "error");
+        setSaving(false);
+        setUploadingHeroLogo(false);
+        return;
+      }
+      setUploadingHeroLogo(false);
+    }
 
     const payload = [
       { id: "home_hero_title", content: heroTitle.trim(), updated_at: new Date().toISOString() },
@@ -73,7 +167,8 @@ export default function AdminHomeSection({ onShowToast }: AdminHomeSectionProps)
       { id: "home_btn_whatsapp_link", content: btnWhatsappLink.trim(), updated_at: new Date().toISOString() },
       { id: "home_btn_kural_text", content: btnKuralText.trim(), updated_at: new Date().toISOString() },
       { id: "home_btn_kural_link", content: btnKuralLink.trim(), updated_at: new Date().toISOString() },
-      { id: "home_logo_url", content: logoUrl.trim(), updated_at: new Date().toISOString() },
+      { id: "hero_logo_url", content: finalLogoUrl.trim(), updated_at: new Date().toISOString() },
+      { id: "home_logo_url", content: finalLogoUrl.trim(), updated_at: new Date().toISOString() },
       { id: "home_moments_title", content: homeMomentsTitle.trim(), updated_at: new Date().toISOString() },
       { id: "home_moments_subtitle", content: homeMomentsSubtitle.trim(), updated_at: new Date().toISOString() },
     ];
@@ -83,7 +178,7 @@ export default function AdminHomeSection({ onShowToast }: AdminHomeSectionProps)
     if (error) {
       onShowToast("Failed to save homepage: " + error.message, "error");
     } else {
-      onShowToast("Homepage settings saved successfully!", "success");
+      onShowToast("Homepage settings and hero emblem saved successfully!", "success");
     }
     setSaving(false);
   };
@@ -167,14 +262,77 @@ export default function AdminHomeSection({ onShowToast }: AdminHomeSectionProps)
             </div>
           </div>
 
-          {/* Logo Motif Preview */}
-          <div className="pt-2 border-t border-border/80 flex items-center justify-between">
-            <div>
-              <label className="text-xs font-bold uppercase tracking-wider text-foreground">Active Homepage Emblem</label>
-              <p className="text-xs text-muted-foreground">Hero circular badge icon: <code className="text-xs font-mono font-bold text-foreground">{logoUrl}</code></p>
-            </div>
-            <div className="w-14 h-14 rounded-full bg-white border border-border shadow-xs flex items-center justify-center p-2 relative">
-              <Image src={logoUrl} alt="Logo Preview" width={44} height={44} className="object-contain" />
+          {/* Hero Logo Emblem Upload & Crop */}
+          <div className="pt-4 border-t border-border/80">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-white rounded-2xl border border-border">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden shrink-0 shadow-md ring-4 ring-primary/20 bg-white flex items-center justify-center relative">
+                  <Image
+                    src={heroLogoFile ? URL.createObjectURL(heroLogoFile) : (logoUrl || "/logo.png")}
+                    alt="Homepage Emblem Preview"
+                    width={80}
+                    height={80}
+                    unoptimized
+                    className="w-full h-full object-contain p-2"
+                  />
+                  {uploadingHeroLogo && (
+                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center text-white text-[10px] font-bold">
+                      Uploading...
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <h4 className="text-sm font-bold text-foreground">Hero Badge Emblem / Logo</h4>
+                    {heroLogoFile && (
+                      <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-200 uppercase">
+                        Unsaved Selection
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground max-w-sm">
+                    Displayed in the circular hero badge on the homepage. Cropped to 1:1 square with circular guide.
+                  </p>
+                  <p className="text-[11px] font-mono text-muted-foreground mt-1 truncate max-w-xs">
+                    {heroLogoFile ? `Staged: ${heroLogoFile.name}` : `Active: ${logoUrl}`}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2 shrink-0">
+                <button
+                  type="button"
+                  onClick={handleRecropLogo}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-secondary hover:bg-primary/10 hover:text-primary text-foreground font-bold text-xs border border-border transition-colors shadow-2xs cursor-pointer"
+                  title="Re-crop current emblem"
+                >
+                  <Crop className="w-3.5 h-3.5" />
+                  <span>Re-crop</span>
+                </button>
+
+                <label className="cursor-pointer inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-secondary hover:bg-primary/10 hover:text-primary text-foreground font-bold text-xs border border-border transition-colors shadow-2xs">
+                  <Camera className="w-3.5 h-3.5" />
+                  <span>Change Logo</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleSelectLogo}
+                  />
+                </label>
+
+                {(heroLogoFile || (logoUrl && logoUrl !== "/logo.png")) && (
+                  <button
+                    type="button"
+                    onClick={handleResetLogo}
+                    className="inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-bold text-muted-foreground hover:text-red-500 bg-secondary hover:bg-red-50 transition-colors border border-border cursor-pointer shadow-2xs"
+                    title="Reset to default official emblem"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span>Reset Default</span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -315,6 +473,23 @@ export default function AdminHomeSection({ onShowToast }: AdminHomeSectionProps)
           </button>
         </div>
       </form>
+
+      {/* Hero Logo Crop Modal */}
+      {activeCrop && activeCrop.isOpen && (
+        <ImageCropModal
+          isOpen={activeCrop.isOpen}
+          imageSrc={activeCrop.imageSrc}
+          fileName={activeCrop.fileName}
+          title={activeCrop.title}
+          aspectRatio={activeCrop.aspectRatio}
+          aspectLabel={activeCrop.aspectLabel}
+          showCircleGuide={activeCrop.showCircleGuide}
+          maxWidth={activeCrop.maxWidth}
+          maxHeight={activeCrop.maxHeight}
+          onCancel={() => setActiveCrop(null)}
+          onApply={handleCropApply}
+        />
+      )}
     </div>
   );
 }
