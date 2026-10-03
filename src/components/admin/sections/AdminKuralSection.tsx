@@ -5,7 +5,7 @@ import Link from "next/link";
 import { 
   BookOpen, Camera, Crop, Plus, Trash2, Pencil, ArrowUp, ArrowDown, X, 
   AlertCircle, Save, CalendarDays, Palette, Users2, Award, Heart, 
-  Megaphone, Music, Target, Compass, Sparkles 
+  Megaphone, Music, Target, Compass, Sparkles, Eye, EyeOff, ExternalLink, ArrowRight
 } from "lucide-react";
 import { createClient } from "@/utils/supabase/client";
 import { compressImage } from "@/utils/compressImage";
@@ -37,6 +37,12 @@ const AVAILABLE_KURAL_ICONS = [
   { name: "Sparkles", label: "Cultural Heritage", icon: Sparkles },
 ];
 
+function getCardIcon(iconName: string) {
+  const item = AVAILABLE_KURAL_ICONS.find((i) => i.name === iconName);
+  const IconComponent = item ? item.icon : Sparkles;
+  return <IconComponent className="w-5 h-5 text-primary" />;
+}
+
 const KNOWN_SITE_ROUTES = [
   { path: "/join", label: "Join Us Community Page" },
   { path: "/gallery", label: "Moments & Archive Gallery" },
@@ -49,6 +55,7 @@ const KNOWN_SITE_ROUTES = [
 export default function AdminKuralSection({ onShowToast }: AdminKuralSectionProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [kuralPreviewMode, setKuralPreviewMode] = useState(false);
 
   // Kural Page State
   const [kuralTitle, setKuralTitle] = useState("Kural LPU");
@@ -492,16 +499,257 @@ export default function AdminKuralSection({ onShowToast }: AdminKuralSectionProp
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={handleSaveKural}
-            disabled={saving}
-            className="px-6 py-2.5 rounded-xl bg-primary text-white hover:bg-primary/90 font-bold text-xs sm:text-sm transition-colors shadow-md disabled:opacity-50 flex items-center gap-2 self-start sm:self-auto cursor-pointer"
-          >
-            <Save className="w-4 h-4" />
-            <span>{saving ? "Saving..." : "Save Kural Page"}</span>
-          </button>
+          <div className="flex items-center gap-3 flex-wrap">
+            {/* Live Preview Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setKuralPreviewMode(!kuralPreviewMode)}
+              className={`px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all flex items-center gap-2 border cursor-pointer ${
+                kuralPreviewMode
+                  ? "bg-amber-500/10 text-amber-800 border-amber-300 shadow-xs"
+                  : "bg-secondary text-foreground hover:bg-secondary/80 border-border"
+              }`}
+              title="Toggle Live In-Page Preview of the Kural page"
+            >
+              {kuralPreviewMode ? <EyeOff className="w-4 h-4 text-amber-600" /> : <Eye className="w-4 h-4 text-primary" />}
+              <span>{kuralPreviewMode ? "Hide Preview" : "Live Preview"}</span>
+              <span
+                className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold ${
+                  kuralPreviewMode ? "bg-amber-600 text-white" : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {kuralPreviewMode ? "ON" : "OFF"}
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleSaveKural}
+              disabled={saving}
+              className="px-6 py-2.5 rounded-xl bg-primary text-white hover:bg-primary/90 font-bold text-xs sm:text-sm transition-colors shadow-md disabled:opacity-50 flex items-center gap-2 self-start sm:self-auto cursor-pointer"
+            >
+              <Save className="w-4 h-4" />
+              <span>{saving ? "Saving..." : "Save Kural Page"}</span>
+            </button>
+          </div>
         </div>
+
+        {/* LIVE PREVIEW PANEL (WHEN PREVIEW MODE IS ACTIVE) */}
+        {kuralPreviewMode && (
+          <div className="mb-10 rounded-3xl border-2 border-amber-400/80 bg-white shadow-xl overflow-hidden">
+            {/* Browser Window Mock Chrome */}
+            <div className="bg-gradient-to-r from-amber-50 via-white to-amber-50 px-4 py-3 border-b border-amber-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3 h-3 rounded-full bg-red-400 inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-yellow-400 inline-block" />
+                  <span className="w-3 h-3 rounded-full bg-emerald-400 inline-block" />
+                </div>
+                <div className="px-3 py-1 rounded-lg bg-white border border-amber-200 text-xs font-mono text-muted-foreground flex items-center gap-2">
+                  <span className="text-emerald-600 font-bold">🔒</span>
+                  <span>https://lputamizhans.com/kural</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 flex-wrap">
+                <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-amber-500 text-white font-bold text-xs shadow-xs">
+                  <span className="w-2 h-2 rounded-full bg-white animate-ping" />
+                  LIVE PREVIEW • UNSAVED DRAFT
+                </span>
+                <Link
+                  href="/kural"
+                  target="_blank"
+                  className="text-xs font-bold text-primary hover:underline inline-flex items-center gap-1"
+                >
+                  <span>Published Page</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Live-Rendered Viewport Frame */}
+            <div className="p-6 sm:p-10 bg-[#FAFAFA] space-y-12 max-h-[800px] overflow-y-auto">
+              {/* 1. KURAL — WHAT IT IS */}
+              <section className="text-center max-w-3xl mx-auto">
+                {/* Official Kural Logo */}
+                <div className="flex justify-center mb-6">
+                  <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-full overflow-hidden shadow-2xl ring-4 ring-primary/25 bg-white transition-all duration-300">
+                    <img
+                      src={kuralLogoFile ? URL.createObjectURL(kuralLogoFile) : (kuralLogoUrl || "/kural-logo.png")}
+                      alt="Kural Official Logo"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                </div>
+
+                {/* Title with Accent Color on Last Word */}
+                {(() => {
+                  const words = (kuralTitle || "Kural LPU").trim().split(" ");
+                  const prefix = words.length > 1 ? words.slice(0, -1).join(" ") : "";
+                  const accent = words[words.length - 1] || "";
+                  return (
+                    <h1 className="font-heading text-4xl sm:text-5xl md:text-6xl font-black mb-3 text-foreground tracking-tight">
+                      {prefix ? `${prefix} ` : ""}<span className="text-primary">{accent}</span>
+                    </h1>
+                  );
+                })()}
+
+                <p className="font-heading text-xl sm:text-2xl font-bold text-primary mb-1">
+                  {kuralTamilMotto || "யாதும் ஊரே யாவரும் கேளிர்"}
+                </p>
+                <p className="text-muted-foreground font-semibold text-xs sm:text-sm tracking-wider mb-6 italic">
+                  {kuralMottoTranslit || "“To us all towns are one, all men our kin”"}
+                </p>
+
+                {/* Community Information Strip */}
+                <div className="grid grid-cols-3 gap-3 max-w-lg mx-auto mb-8 py-3.5 px-4 bg-white rounded-2xl border border-border text-center shadow-xs">
+                  <div>
+                    <p className="font-heading text-xs sm:text-sm font-extrabold text-primary">Tamil Community</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Student Organization</p>
+                  </div>
+                  <div className="border-x border-border/80">
+                    <p className="font-heading text-xs sm:text-sm font-extrabold text-foreground">LPU Campus</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">University Club</p>
+                  </div>
+                  <div>
+                    <p className="font-heading text-xs sm:text-sm font-extrabold text-primary">Punjab, India</p>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Phagwara</p>
+                  </div>
+                </div>
+
+                {/* Optional Featured Showcase Image */}
+                {(kuralImageFile || kuralImageUrl) && (
+                  <div className="mb-8 rounded-3xl overflow-hidden border border-border shadow-md bg-secondary aspect-[16/9] sm:aspect-[21/9] relative">
+                    <img
+                      src={kuralImageFile ? URL.createObjectURL(kuralImageFile) : kuralImageUrl}
+                      alt={kuralTitle}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
+                {/* Relationship Distinction Card */}
+                <div className="bg-white border-2 border-primary/20 rounded-3xl p-6 sm:p-8 text-left shadow-xs mb-6">
+                  <h2 className="font-heading text-lg sm:text-xl font-bold text-foreground mb-3 flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-primary inline-block" />
+                    {kuralRelHeading}
+                  </h2>
+                  <div className="space-y-3 text-muted-foreground text-sm sm:text-base leading-relaxed font-medium">
+                    <p>{kuralRelCommunity}</p>
+                    <p>{kuralRelOrg}</p>
+                    {kuralRelTagline && (
+                      <p className="text-xs sm:text-sm text-muted-foreground pt-1 border-t border-border">
+                        {kuralRelTagline}
+                      </p>
+                    )}
+                  </div>
+                </div>
+              </section>
+
+              {/* 2. VISION & MISSION */}
+              <section>
+                <div className="text-center mb-6">
+                  <span className="text-[11px] font-mono font-bold tracking-widest text-primary uppercase">
+                    Purpose &amp; Direction
+                  </span>
+                  <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-foreground mt-1">
+                    Vision &amp; Mission
+                  </h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+                  <div className="bg-white border border-border p-6 rounded-3xl shadow-xs flex flex-col justify-between">
+                    <div>
+                      <span className="text-[11px] font-bold tracking-widest text-primary uppercase block mb-1">
+                        Our Vision
+                      </span>
+                      <h3 className="font-heading text-lg font-bold text-foreground mb-2">
+                        {kuralVisionTitle}
+                      </h3>
+                      <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed font-medium">
+                        {kuralVisionText}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="bg-white border border-border p-6 rounded-3xl shadow-xs flex flex-col justify-between">
+                    <div>
+                      <span className="text-[11px] font-bold tracking-widest text-primary uppercase block mb-1">
+                        Our Mission
+                      </span>
+                      <h3 className="font-heading text-lg font-bold text-foreground mb-2">
+                        {kuralMissionTitle}
+                      </h3>
+                      <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed font-medium">
+                        {kuralMissionText}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </section>
+
+              {/* 3. WHAT WE DO */}
+              <section>
+                <div className="text-center mb-6 max-w-xl mx-auto">
+                  <span className="text-[11px] font-mono font-bold tracking-widest text-primary uppercase">
+                    Action on Campus
+                  </span>
+                  <h2 className="font-heading text-2xl sm:text-3xl font-extrabold text-foreground mt-1 mb-2">
+                    What We Do
+                  </h2>
+                  <p className="text-muted-foreground text-xs sm:text-sm font-medium leading-relaxed">
+                    Here is how Kural serves Tamil students across campus.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
+                  {kuralWhatWeDo.map((item, idx) => (
+                    <div
+                      key={item.id || idx}
+                      className="bg-white border border-border rounded-2xl p-5 shadow-xs flex flex-col"
+                    >
+                      <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center mb-3">
+                        {getCardIcon(item.icon)}
+                      </div>
+                      <h3 className="font-heading text-base font-bold text-foreground mb-1">
+                        {item.title}
+                      </h3>
+                      <p className="text-muted-foreground text-xs sm:text-sm font-medium leading-relaxed">
+                        {item.description}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+
+              {/* 4. JOIN / GET INVOLVED CTA */}
+              <section className="bg-primary text-white rounded-3xl p-6 sm:p-8 text-center shadow-lg relative overflow-hidden">
+                <div className="relative z-10 max-w-xl mx-auto">
+                  <span className="inline-block px-3 py-1 rounded-full bg-white/20 text-white text-[11px] font-bold uppercase tracking-wider mb-3">
+                    {kuralCtaBadge || "Get Involved"}
+                  </span>
+                  <h2 className="font-heading text-xl sm:text-2xl font-black leading-tight mb-3">
+                    {kuralCtaTitle}
+                  </h2>
+                  <p className="text-white/90 text-xs sm:text-sm font-medium leading-relaxed mb-6">
+                    {kuralCtaDesc}
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <span className="inline-flex items-center justify-center gap-2 bg-white text-primary px-6 py-2.5 rounded-full font-bold text-xs sm:text-sm shadow-sm">
+                      {kuralCtaBtnText} <ArrowRight className="w-4 h-4" />
+                    </span>
+                    {kuralCtaSecondaryText && (
+                      <span className="inline-flex items-center justify-center gap-2 bg-primary/40 border border-white/40 text-white px-6 py-2.5 rounded-full font-bold text-xs sm:text-sm">
+                        {kuralCtaSecondaryText}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </section>
+            </div>
+          </div>
+        )}
 
         <div className="space-y-10">
           {/* SECTION 1: KURAL IDENTITY & LOGO */}
