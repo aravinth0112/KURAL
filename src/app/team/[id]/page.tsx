@@ -125,20 +125,20 @@ export default async function MemberProfilePage({ params }: PageProps) {
             {/* Left: Circular Profile Photo with Organic Brand Blob Backdrop & Social Actions */}
             <div className="md:col-span-5 flex flex-col items-center justify-center">
               {/* Photo & Organic Blob Wrapper */}
-              <div className="relative w-64 h-64 sm:w-72 sm:h-72 flex items-center justify-center my-2 sm:my-3">
+              <div className="relative w-64 h-64 sm:w-72 sm:h-72 md:w-56 md:h-56 lg:w-72 lg:h-72 xl:w-80 xl:h-80 flex items-center justify-center my-3 sm:my-4">
                 {/* Organic Asymmetric Brand Gradient Blob Backdrop */}
                 <div 
-                  className="absolute -inset-8 sm:-inset-10 pointer-events-none -z-0 flex items-center justify-center"
+                  className="absolute -inset-8 sm:-inset-10 md:-inset-6 lg:-inset-10 xl:-inset-12 pointer-events-none z-0 flex items-center justify-center translate-x-1 -translate-y-2 md:translate-x-1 md:-translate-y-2 lg:translate-x-2 lg:-translate-y-3 xl:translate-x-3 xl:-translate-y-3"
                   aria-hidden="true"
                 >
                   <svg 
-                    viewBox="0 0 600 600" 
+                    viewBox="60 40 440 460" 
                     fill="none" 
                     xmlns="http://www.w3.org/2000/svg" 
-                    className="w-full h-full filter drop-shadow-[0_16px_32px_rgba(240,127,25,0.22)]"
+                    className="w-full h-full overflow-visible filter drop-shadow-[0_16px_32px_rgba(240,127,25,0.22)]"
                   >
                     <defs>
-                      <linearGradient id="memberBlobGrad" x1="20%" y1="0%" x2="80%" y2="100%">
+                      <linearGradient id="memberBlobGrad" x1="15%" y1="0%" x2="85%" y2="100%">
                         <stop offset="0%" stopColor="#F07F19" />
                         <stop offset="35%" stopColor="#FFA875" />
                         <stop offset="70%" stopColor="#FBC896" />
@@ -152,8 +152,8 @@ export default async function MemberProfilePage({ params }: PageProps) {
                   </svg>
                 </div>
 
-                {/* Circular Photo Container */}
-                <div className="relative z-10 w-52 h-52 sm:w-60 sm:h-60 aspect-square rounded-full overflow-hidden bg-muted border-4 border-white shadow-xl shadow-black/10 flex items-center justify-center">
+                {/* Circular Photo Container - Asymmetrically Offset */}
+                <div className="relative z-10 w-48 h-48 sm:w-52 sm:h-52 md:w-44 md:h-44 lg:w-56 lg:h-56 xl:w-60 xl:h-60 aspect-square rounded-full overflow-hidden bg-muted border-4 border-white shadow-xl shadow-black/15 flex items-center justify-center -translate-x-3 translate-y-3 md:-translate-x-2 md:translate-y-2 lg:-translate-x-4 lg:translate-y-3 xl:-translate-x-5 xl:translate-y-4">
                   {member.image_url ? (
                     <>
                       <Image
